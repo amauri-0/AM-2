@@ -62,6 +62,11 @@
           particulas[i].addGravity();
           particulas[i].update();
           particulas[i].display();
+          text(
+            i + 1,
+            particulas[i].position.x - 5,
+            particulas[i].position.y - particulas[i].radius * 2
+          );
         }
       }
 
