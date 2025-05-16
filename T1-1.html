@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" href="style.css" />
+    <title>Abyss</title>
+  </head>
+  <body>
+    <div class="section">
+      <h2>Vetores e P5.js</h2>
+      <p>...</p>
+      <p>...</p>
+      <div id="vetores"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.js"></script>
+    <script src="vetores.js"></script>
+    <script>
+      let particulas = [];
+
+      function setup() {
+        createCanvas(1080, 720);
+        for (let i = 0; i < 0; i++) {
+          let posicaoValida = false;
+          let particula;
+          let colorP = color(
+            random(150, 255),
+            random(150, 255),
+            random(150, 255)
+          );
+
+          // Garante que a partícula seja criada em uma posição válida
+          while (!posicaoValida) {
+            particula = new Particula(
+              int(random(40, 680)),
+              int(random(400, 40)),
+              int(random(20, 30)),
+              colorP,
+              0.05
+            );
+            posicaoValida = particula.checaPosicaoValida();
+          }
+          particulas.push(particula);
+        }
+      }
+
+      function draw() {
+        background(0);
+        //noStroke();
+
+        for (let i = 0; i < particulas.length; i++) {
+          // Verifica colisão com outras partículas
+          for (let j = 0; j < particulas.length; j++) {
+            if (i !== j) {
+              particulas[i].checaColisao(particulas[j]);
+            }
+          }
+          // Verifica colisão com as paredes do canvas
+          particulas[i].checaColisaoCanvas();
+          particulas[i].addGravity();
+          particulas[i].update();
+          particulas[i].display();
+        }
+      }
+
+      class Particula {
+        constructor(x, y, radius, color, gravity) {
+          this.position = createVector(x, y);
+          this.velocity = createVector(int(random(-2, 3)), int(random(-2, 3)));
+          this.radius = radius;
+          this.color = color;
+          this.gravity = gravity;
+        }
+
+        checaPosicaoValida() {
+          // Verifica se a posição da partícula não está muito próxima de outra partícula
+          for (let i = 0; i < particulas.length; i++) {
+            let distance = dist(
+              this.position.x,
+              this.position.y,
+              particulas[i].position.x,
+              particulas[i].position.y
+            );
+            if (distance < this.radius + particulas[i].radius) {
+              return false;
+            }
+          }
+
+          // Verifica se a posição da partícula não está muito próxima das bordas do canvas
+          if (
+            this.position.x - this.radius < 0 ||
+            this.position.x + this.radius > width ||
+            this.position.y - this.radius < 0 ||
+            this.position.y + this.radius > height
+          ) {
+            return false;
+          }
+
+          return true;
+        }
+
+        update() {
+          this.position.add(this.velocity);
+        }
+
+        display() {
+          fill(this.color);
+          ellipse(
+            this.position.x,
+            this.position.y,
+            this.radius * 2,
+            this.radius * 2
+          );
+        }
+
+        checaColisao(outraParticula) {
+          let distance = dist(
+            this.position.x,
+            this.position.y,
+            outraParticula.position.x,
+            outraParticula.position.y
+          );
+          if (distance <= this.radius + outraParticula.radius) {
+            // Colisão detectada, inverte as velocidades
+            let temp = this.velocity.copy();
+            this.velocity = outraParticula.velocity.copy();
+            outraParticula.velocity = temp;
+
+            // https://ericleong.me/research/circle-circle/
+            let midpointx = (this.position.x + outraParticula.position.x) / 2;
+            let midpointy = (this.position.y + outraParticula.position.y) / 2;
+
+            this.position.x =
+              midpointx +
+              (this.radius * (this.position.x - outraParticula.position.x)) /
+                distance;
+            this.position.y =
+              midpointy +
+              (this.radius * (this.position.y - outraParticula.position.y)) /
+                distance;
+            outraParticula.position.x =
+              midpointx +
+              (outraParticula.radius *
+                (outraParticula.position.x - this.position.x)) /
+                distance;
+            outraParticula.position.y =
+              midpointy +
+              (outraParticula.radius *
+                (outraParticula.position.y - this.position.y)) /
+                distance;
+          }
+        }
+        checaColisaoCanvas() {
+          if (this.position.x - this.radius < 1) {
+            this.position.x = 1 + this.radius;
+            this.velocity.x *= -1; // Inverte ao atingir as bordas horizontais
+          }
+          if (this.position.x + this.radius > width - 1) {
+            this.position.x = width - 1 - this.radius;
+            this.velocity.x *= -1; // Inverte ao atingir as bordas horizontais
+          }
+          if (this.position.y - this.radius < 1) {
+            this.position.y = 1 + this.radius;
+            this.velocity.y *= -1; // Inverte ao atingir as bordas horizontais
+          }
+          if (this.position.y + this.radius > height - 1) {
+            this.position.y = height - 1 - this.radius;
+            this.velocity.y *= -1; // Inverte ao atingir as bordas horizontais
+          }
+        }
+
+        addGravity() {
+          this.velocity.y += this.gravity;
+        }
+      }
+
+      function mousePressed() {
+        let posicaoValida = false;
+        let particula;
+        let colorP = color(
+          random(150, 255),
+          random(150, 255),
+          random(150, 255)
+        );
+        particula = new Particula(
+          int(mouseX),
+          int(mouseY),
+          int(random(20, 30)),
+          colorP,
+          0.2
+        );
+        posicaoValida = particula.checaPosicaoValida();
+        if (posicaoValida) {
+          particulas.push(particula);
+        }
+      }
+    </script>
+  </body>
+</html>
