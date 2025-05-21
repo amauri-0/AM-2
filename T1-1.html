@@ -9,9 +9,9 @@
   </head>
   <body>
     <div class="section">
-      <h2>Vetores e P5.js</h2>
-      <p>...</p>
-      <p>...</p>
+      <h2>Arrays e Particulas Animadas com p5.js</h2>
+      <h3>João Amauri Rodrigues do Nascimento - 566937</h3>
+      <p>Clique na tela para criar uma partícula. Como há uma verificação de espaço, só é possível criar a partícula em espaços vazios.</p>
       <div id="vetores"></div>
     </div>
 
@@ -22,13 +22,13 @@
 
       function setup() {
         createCanvas(1080, 720);
-        for (let i = 0; i < 0; i++) {
+        for (let i = 0; i < 3; i++) {
           let posicaoValida = false;
           let particula;
           let colorP = color(
-            random(150, 255),
-            random(150, 255),
-            random(150, 255)
+            random(100, 255),
+            random(100, 255),
+            random(100, 255)
           );
 
           // Garante que a partícula seja criada em uma posição válida
@@ -38,7 +38,7 @@
               int(random(400, 40)),
               int(random(20, 30)),
               colorP,
-              0.05
+              0.2
             );
             posicaoValida = particula.checaPosicaoValida();
           }
@@ -72,8 +72,9 @@
 
       class Particula {
         constructor(x, y, radius, color, gravity) {
+          let Spd = [-6, -5, -4, -3, 3, 4, 5, 6];
           this.position = createVector(x, y);
-          this.velocity = createVector(int(random(-2, 3)), int(random(-2, 3)));
+          this.velocity = createVector((random(Spd)), random(Spd));
           this.radius = radius;
           this.color = color;
           this.gravity = gravity;
@@ -132,7 +133,6 @@
             let temp = this.velocity.copy();
             this.velocity = outraParticula.velocity.copy();
             outraParticula.velocity = temp;
-
             // https://ericleong.me/research/circle-circle/
             let midpointx = (this.position.x + outraParticula.position.x) / 2;
             let midpointy = (this.position.y + outraParticula.position.y) / 2;
@@ -157,6 +157,7 @@
                 distance;
           }
         }
+
         checaColisaoCanvas() {
           if (this.position.x - this.radius < 1) {
             this.position.x = 1 + this.radius;
@@ -185,9 +186,9 @@
         let posicaoValida = false;
         let particula;
         let colorP = color(
-          random(150, 255),
-          random(150, 255),
-          random(150, 255)
+          random(100, 255),
+          random(100, 255),
+          random(100, 255)
         );
         particula = new Particula(
           int(mouseX),
