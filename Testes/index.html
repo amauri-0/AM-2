@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Abyss</title>
+
+  <!-- Importa a biblioteca p5.js (CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.js"></script>
+
+  <!-- Código JavaScript do sketch p5.js -->
+  <script>
+  let p1, p2, p3, p4;
+  let arrastando = false;
+  let t1Value = null;
+  let t2Value = null;
+
+  function setup() {
+    createCanvas(400, 400);
+    p1 = createVector(50, 200);
+    p2 = createVector(350, 200);
+    p3 = createVector(200, 350);
+    p4 = createVector(200, 50);
+  }
+
+  function draw() {
+    background(240);
+    text("Arraste os segmentos de retas pelas pontas", 80, 20);
+
+    if (arrastando) {
+      // Atualiza as posições dos pontos durante o arrastando
+      if (arrastando === p1) {
+        p1.set(mouseX, mouseY);
+      } else if (arrastando === p2) {
+        p2.set(mouseX, mouseY);
+      } else if (arrastando === p3) {
+        p3.set(mouseX, mouseY);
+      } else if (arrastando === p4) {
+        p4.set(mouseX, mouseY);
+      }
+    }
+
+    // Verifique a interseção e exiba o resultado
+    let interseccao = encontraInterseccao(p1, p2, p3, p4);
+    text("A", p1.x, p1.y);
+    text("B", p2.x, p2.y);
+    text("C", p4.x, p4.y);
+    text("D", p3.x, p3.y);
+    stroke(255, 0, 0);
+    drawSegment(p1, p2);
+    drawSegment(p1, p2);
+    stroke(0, 0, 255);
+    drawSegment(p3, p4);
+    drawSegment(p3, p4);
+    stroke(0);
+
+    if (interseccao == 1) {
+      text("Os segmentos são paralelos ou colineares.",90,380);
+    } else {
+      if (interseccao) {
+        ellipse(interseccao.x, interseccao.y, 10, 10);
+        // Exibe o valor de t1 e t2
+        if (t1Value !== null) {
+          text("tAB: " + nf(t1Value, 0, 2) +", "+"tCD: " + nf(t2Value, 0, 2), interseccao.x + 5, interseccao.y - 5);
+        }
+        text("Os segmentos de reta se intersectam no ponto (" + round(interseccao.x,2) + ", " + round(interseccao.y,2) + ")",40,380);
+      } else {
+        text("Os segmentos de reta não se intersectam e são degenerados.",30,380);
+      }
+    }
+  }
+
+  function drawSegment(start, end) {
+    line(start.x, start.y, end.x, end.y);
+  }
+
+  function encontraInterseccao(p1, p2, p3, p4) {
+    let v1 = p5.Vector.sub(p2, p1);
+    let v2 = p5.Vector.sub(p3, p4);
+
+    let p1p3 = p5.Vector.sub(p4, p1);
+
+    // Calcula determinante
+    let det = v1.x * v2.y - v1.y * v2.x;
+
+    if (det === 0) {
+      return 1; // Os segmentos são paralelos ou colineares
+    }
+
+    // Calcula os "t" para a interseção
+    let t1 = (p1p3.x * v2.y - p1p3.y * v2.x) / det;
+    t1Value = t1; // Atualiza o valor de t1
+    let t2 = (p1p3.x * v1.y - p1p3.y * v1.x) / det;
+    t2Value = t2; // Atualiza o valor de t2
+
+    // Verifica se a interseção ocorre dentro dos segmentos
+    if (t1 >= 0 && t1 <= 1 && t2 >= 0 && t2 <= 1) {
+      let interseccaoX = p1.x + t1 * v1.x;
+      let interseccaoY = p1.y + t1 * v1.y;
+      return createVector(interseccaoX, interseccaoY);
+    } else {
+      return null; // Não tem interseção entre os segmentos de reta
+    }
+  }
+
+  function mousePressed() {
+    if (dist(mouseX, mouseY, p1.x, p1.y) < 10) {
+      arrastando = p1;
+    } else if (dist(mouseX, mouseY, p2.x, p2.y) < 10) {
+      arrastando = p2;
+    } else if (dist(mouseX, mouseY, p3.x, p3.y) < 10) {
+      arrastando = p3;
+    } else if (dist(mouseX, mouseY, p4.x, p4.y) < 10) {
+      arrastando = p4;
+    }
+  }
+
+  function mouseReleased() {
+    arrastando = false;
+  }
+  </script>
+</head>
+<body>
+</body>
+</html>
