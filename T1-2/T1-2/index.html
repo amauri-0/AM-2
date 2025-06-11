@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AM2 - T1.2 - João Amauri</title>
+  </head>
+  <body>
+    <input
+      type="text"
+      id="busca"
+      onkeyup="buscarTabela()"
+      placeholder="Buscar por nome ou idade"
+    />
+
+    <table border="1" id="dadosTabela">
+      <thead>
+        <tr>
+          <th onclick="ordenarTabelaNome()">Nome</th>
+          <th>Email</th>
+          <th onclick="ordenarTabelaIdade()">Idade</th>
+        </tr>
+      </thead>
+      <tbody id="corpoTabela">
+        <!-- Os usuários serão inseridos aqui -->
+      </tbody>
+    </table>
+
+    <!-- Área para os botões de paginação -->
+    <div id="paginacao"></div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
